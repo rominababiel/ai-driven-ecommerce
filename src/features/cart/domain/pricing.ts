@@ -1,8 +1,7 @@
-import { roundMoney } from '@/shared/lib/money';
+import { computeOrderAmounts } from '../../../../amplify/shared/pricing';
 import type { CartItem } from './cart';
 
-export const FREE_SHIPPING_THRESHOLD = 100;
-export const SHIPPING_FEE = 9.99;
+export { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from '../../../../amplify/shared/pricing';
 
 export interface CartTotals {
   itemCount: number;
@@ -13,7 +12,5 @@ export interface CartTotals {
 
 export function calculateTotals(items: readonly Pick<CartItem, 'price' | 'quantity'>[]): CartTotals {
   const itemCount = items.reduce((count, item) => count + item.quantity, 0);
-  const subtotal = roundMoney(items.reduce((sum, item) => sum + item.price * item.quantity, 0));
-  const shipping = subtotal === 0 || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
-  return { itemCount, subtotal, shipping, total: roundMoney(subtotal + shipping) };
+  return { itemCount, ...computeOrderAmounts(items) };
 }

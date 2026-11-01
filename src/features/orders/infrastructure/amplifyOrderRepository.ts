@@ -27,8 +27,8 @@ export function createAmplifyOrderRepository(): OrderRepository {
   const client = () => getDataClient().models.Order;
 
   return {
-    async create(input) {
-      return toOrder(unwrap(await client().create(input)));
+    async place({ lines, shipping }) {
+      return toOrder(unwrap(await getDataClient().mutations.placeOrder({ lines, shipping })));
     },
     async listByCustomer(customerId) {
       const records = await collectPages((nextToken) => client().listOrderByCustomerId({ customerId }, { nextToken }));

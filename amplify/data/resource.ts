@@ -1,4 +1,5 @@
 import { a, defineData, type ClientSchema } from '@aws-amplify/backend';
+import { placeOrderFunction } from '../functions/place-order/resource';
 import { ADMIN_GROUP } from '../shared/constants';
 
 const ASSISTANT_PROMPT = `Eres el asistente de moda de una tienda de ropa urbana.
@@ -43,16 +44,32 @@ const schema = a.schema({
     country: a.string().required(),
   }),
 
+  OrderLine: a.customType({
+    productId: a.id().required(),
+    quantity: a.integer().required(),
+  }),
+
   Order: a
     .model({
       customerId: a.id().required(),
+      owner: a.string().authorization((allow) => [allow.owner().to(['read']), allow.group(ADMIN_GROUP)]),
       items: a.ref('OrderItem').required().array().required(),
       shipping: a.ref('ShippingAddress').required(),
       total: a.float().required(),
       status: a.ref('OrderStatus').required(),
     })
     .secondaryIndexes((index) => [index('customerId')])
-    .authorization((allow) => [allow.owner().to(['create', 'read']), allow.group(ADMIN_GROUP)]),
+    .authorization((allow) => [allow.owner().to(['read']), allow.group(ADMIN_GROUP)]),
+
+  placeOrder: a
+    .mutation()
+    .arguments({
+      lines: a.ref('OrderLine').required().array().required(),
+      shipping: a.ref('ShippingAddress').required(),
+    })
+    .returns(a.ref('Order'))
+    .authorization((allow) => [allow.authenticated()])
+    .handler(a.handler.function(placeOrderFunction)),
 
   shopAssistant: a
     .conversation({
@@ -68,7 +85,7 @@ const schema = a.schema({
       ],
     })
     .authorization((allow) => allow.owner()),
-});
+}).authorization((allow) => [allow.resource(placeOrderFunction)]);
 
 export type Schema = ClientSchema<typeof schema>;
 

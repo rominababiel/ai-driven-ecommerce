@@ -35,10 +35,19 @@ export interface Order {
   createdAt: string;
 }
 
-export type NewOrder = Omit<Order, 'id' | 'createdAt'>;
+export interface OrderLine {
+  productId: string;
+  quantity: number;
+}
+
+export interface PlaceOrderRequest {
+  customerId: string;
+  lines: OrderLine[];
+  shipping: ShippingAddress;
+}
 
 export interface OrderRepository {
-  create(order: NewOrder): Promise<Order>;
+  place(request: PlaceOrderRequest): Promise<Order>;
   listByCustomer(customerId: string): Promise<Order[]>;
   listAll(): Promise<Order[]>;
   updateStatus(id: string, status: OrderStatus): Promise<Order>;

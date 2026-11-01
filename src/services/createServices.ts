@@ -24,7 +24,7 @@ export function createLocalServices(): Services {
     dataSource: 'local',
     auth: createLocalAuthGateway(),
     products,
-    orders: createLocalOrderRepository(),
+    orders: createLocalOrderRepository(products),
     assistant: createLocalAssistantGateway(products),
   };
 }
