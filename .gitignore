@@ -28,3 +28,4 @@ amplify_outputs*
 amplifyconfiguration*
 .env*.local
 coverage
+.vitest/

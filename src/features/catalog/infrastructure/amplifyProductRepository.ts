@@ -14,6 +14,10 @@ function toProduct(record: ProductRecord): Product {
     imageUrl: record.imageUrl ?? '',
     stock: record.stock,
     rating: record.rating ?? 0,
+    compareAtPrice: record.compareAtPrice ?? null,
+    isNew: record.isNew ?? null,
+    color: record.color ?? null,
+    hoverImageUrl: record.hoverImageUrl ?? null,
   };
 }
 

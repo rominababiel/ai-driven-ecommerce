@@ -39,8 +39,23 @@ export function createLocalAuthGateway(): AuthGateway {
     async confirmSignUp() {
       return;
     },
+    async requestPasswordReset() {
+      return;
+    },
+    async confirmPasswordReset(email, code, newPassword) {
+      if (!/^\d{6}$/.test(code)) throw new Error('El código no es válido');
+      const user = findByEmail(email);
+      if (!user) throw new Error('No encontramos una cuenta con ese correo');
+      users.write(users.read().map((candidate) => (candidate.id === user.id ? { ...candidate, password: newPassword } : candidate)));
+    },
+    async signInWithGoogle() {
+      throw new Error('Ingresar con Google funciona solo en la versión publicada');
+    },
     async signOut() {
       session.write(null);
+    },
+    subscribe() {
+      return () => undefined;
     },
   };
 }

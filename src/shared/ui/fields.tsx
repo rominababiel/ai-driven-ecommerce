@@ -3,9 +3,9 @@ import { cn } from '@/shared/lib/cn';
 
 const controlStyles = (error?: string) =>
   cn(
-    'w-full rounded-lg border bg-white px-3 text-sm text-zinc-900 outline-none transition-shadow',
-    'focus:ring-2 focus:ring-violet-500 disabled:bg-zinc-100',
-    error ? 'border-red-500' : 'border-zinc-300',
+    'w-full rounded-lg border bg-surface px-3 text-sm text-foreground outline-none transition-shadow',
+    'focus:ring-2 focus:ring-foreground disabled:bg-muted',
+    error ? 'border-danger' : 'border-border',
   );
 
 interface FieldShellProps {
@@ -19,12 +19,12 @@ interface FieldShellProps {
 function FieldShell({ id, label, error, className, children }: FieldShellProps) {
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
-      <label htmlFor={id} className="text-sm font-medium text-zinc-700">
+      <label htmlFor={id} className="text-sm font-medium text-muted-foreground">
         {label}
       </label>
       {children}
       {error && (
-        <p id={`${id}-error`} className="text-xs text-red-600">
+        <p id={`${id}-error`} className="text-xs text-danger">
           {error}
         </p>
       )}

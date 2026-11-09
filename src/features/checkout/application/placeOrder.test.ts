@@ -17,7 +17,7 @@ const shipping = {
 const cartItem = (overrides: { price?: number; quantity?: number } = {}) => ({
   productId: 'p1',
   name: 'Jean',
-  price: 45,
+  price: 30000,
   imageUrl: '',
   quantity: 2,
   stock: 5,
@@ -29,21 +29,26 @@ describe('placeOrder', () => {
   let products: ReturnType<typeof createLocalProductRepository>;
 
   beforeEach(() => {
-    products = createLocalProductRepository([buildProduct({ id: 'p1', name: 'Jean', price: 45, stock: 5 })]);
+    products = createLocalProductRepository([buildProduct({ id: 'p1', name: 'Jean', price: 30000, stock: 5, color: 'Negro' })]);
     orders = createLocalOrderRepository(products);
   });
 
   it('persists a paid order priced from the catalog', async () => {
     const order = await placeOrder(orders, { customerId: 'user-1', items: [cartItem()], shipping });
 
-    expect(order).toMatchObject({ customerId: 'user-1', status: 'PAID', total: 99.99 });
-    expect(order.items).toEqual([{ productId: 'p1', name: 'Jean', price: 45, quantity: 2 }]);
+    expect(order).toMatchObject({ customerId: 'user-1', status: 'PAID', total: 64500, delivery: 'HOME', payment: 'MERCADO_PAGO' });
+    expect(order.items).toEqual([{ productId: 'p1', name: 'Jean', price: 30000, quantity: 2, size: null }]);
     expect(await orders.listByCustomer('user-1')).toHaveLength(1);
   });
 
   it('ignores prices sent by the client', async () => {
-    const order = await placeOrder(orders, { customerId: 'u', items: [cartItem({ price: 0.01 })], shipping });
-    expect(order.total).toBe(99.99);
+    const order = await placeOrder(orders, { customerId: 'u', items: [cartItem({ price: 1 })], shipping });
+    expect(order.total).toBe(64500);
+  });
+
+  it('applies pickup and transfer discount on the server side total', async () => {
+    const order = await placeOrder(orders, { customerId: 'u', items: [cartItem()], shipping, delivery: 'PICKUP', payment: 'TRANSFER' });
+    expect(order).toMatchObject({ total: 51000, discount: 9000, delivery: 'PICKUP', payment: 'TRANSFER' });
   });
 
   it('decrements stock and rejects overselling', async () => {

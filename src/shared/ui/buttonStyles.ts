@@ -4,10 +4,10 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const variants: Record<ButtonVariant, string> = {
-  primary: 'bg-violet-600 text-white hover:bg-violet-700 disabled:bg-violet-300',
-  secondary: 'bg-white text-zinc-900 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-50 disabled:text-zinc-400',
-  ghost: 'text-zinc-700 hover:bg-zinc-100 disabled:text-zinc-400',
-  danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300',
+  primary: 'bg-primary text-primary-foreground hover:bg-primary-hover disabled:opacity-50',
+  secondary: 'bg-surface text-foreground ring-1 ring-inset ring-border hover:bg-muted disabled:text-muted-foreground',
+  ghost: 'text-muted-foreground hover:bg-muted disabled:text-muted-foreground',
+  danger: 'bg-danger text-primary-foreground hover:opacity-90 disabled:opacity-50',
 };
 
 const sizes: Record<ButtonSize, string> = {
@@ -23,7 +23,7 @@ export function buttonStyles({
 }: { variant?: ButtonVariant; size?: ButtonSize; className?: string } = {}): string {
   return cn(
     'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600 disabled:cursor-not-allowed',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground disabled:cursor-not-allowed',
     variants[variant],
     sizes[size],
     className,

@@ -1,5 +1,5 @@
 import type { CartItem } from '@/features/cart/domain/cart';
-import type { Order, OrderRepository, ShippingAddress } from '@/features/orders/domain/order';
+import type { DeliveryMethod, Order, OrderRepository, PaymentMethod, ShippingAddress } from '@/features/orders/domain/order';
 import { hasErrors } from '@/shared/lib/validation';
 import { validateShipping } from '../domain/checkoutValidation';
 
@@ -7,6 +7,8 @@ interface PlaceOrderCommand {
   customerId: string;
   items: readonly CartItem[];
   shipping: ShippingAddress;
+  delivery?: DeliveryMethod;
+  payment?: PaymentMethod;
 }
 
 export async function placeOrder(orders: OrderRepository, command: PlaceOrderCommand): Promise<Order> {
@@ -15,7 +17,9 @@ export async function placeOrder(orders: OrderRepository, command: PlaceOrderCom
 
   return orders.place({
     customerId: command.customerId,
-    lines: command.items.map(({ productId, quantity }) => ({ productId, quantity })),
+    lines: command.items.map(({ productId, quantity, size }) => ({ productId, quantity, size: size ?? null })),
     shipping: command.shipping,
+    delivery: command.delivery ?? 'HOME',
+    payment: command.payment ?? 'MERCADO_PAGO',
   });
 }

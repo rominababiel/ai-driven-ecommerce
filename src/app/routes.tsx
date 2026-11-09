@@ -7,6 +7,7 @@ import { RegisterPage } from '@/features/auth/ui/RegisterPage';
 import { RequireAuth } from '@/features/auth/ui/RequireAuth';
 import { CartPage } from '@/features/cart/ui/CartPage';
 import { CatalogPage } from '@/features/catalog/ui/CatalogPage';
+import { HomePage } from '@/features/catalog/ui/HomePage';
 import { ProductDetailPage } from '@/features/catalog/ui/ProductDetailPage';
 import { CheckoutPage } from '@/features/checkout/ui/CheckoutPage';
 import { OrdersPage } from '@/features/orders/ui/OrdersPage';
@@ -17,7 +18,8 @@ export const routes: RouteObject[] = [
   {
     element: <RootLayout />,
     children: [
-      { index: true, element: <CatalogPage /> },
+      { index: true, element: <HomePage /> },
+      { path: 'catalogo', element: <CatalogPage /> },
       { path: 'products/:id', element: <ProductDetailPage /> },
       { path: 'cart', element: <CartPage /> },
       { path: 'login', element: <LoginPage /> },

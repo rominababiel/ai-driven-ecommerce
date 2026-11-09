@@ -10,6 +10,8 @@ export interface ProductFilters {
   minPrice: number | null;
   maxPrice: number | null;
   inStockOnly: boolean;
+  onSaleOnly: boolean;
+  colors: string[];
   sort: SortOption;
 }
 
@@ -19,6 +21,8 @@ export const DEFAULT_FILTERS: ProductFilters = {
   minPrice: null,
   maxPrice: null,
   inStockOnly: false,
+  onSaleOnly: false,
+  colors: [],
   sort: 'featured',
 };
 
@@ -44,14 +48,25 @@ export function filterProducts(products: readonly Product[], filters: ProductFil
       (filters.category === null || product.category === filters.category) &&
       (filters.minPrice === null || product.price >= filters.minPrice) &&
       (filters.maxPrice === null || product.price <= filters.maxPrice) &&
-      (!filters.inStockOnly || product.stock > 0),
+      (!filters.inStockOnly || product.stock > 0) &&
+      (!filters.onSaleOnly || Boolean(product.compareAtPrice && product.compareAtPrice > product.price)) &&
+      (filters.colors.length === 0 || (product.color != null && filters.colors.includes(product.color))),
   );
   const comparator = comparators[filters.sort];
   return comparator ? result.sort(comparator) : result;
 }
 
+export const CATEGORY_ORDER = ['Buzos y camperas', 'Calzas', 'Remeras y tops', 'Joggers y pantalones', 'Shorts', 'Accesorios'];
+
+function categoryRank(category: string): number {
+  const index = CATEGORY_ORDER.indexOf(category);
+  return index === -1 ? CATEGORY_ORDER.length : index;
+}
+
 export function getCategories(products: readonly Product[]): string[] {
-  return [...new Set(products.map((product) => product.category))].sort((a, b) => a.localeCompare(b, 'es'));
+  return [...new Set(products.map((product) => product.category))].sort(
+    (a, b) => categoryRank(a) - categoryRank(b) || a.localeCompare(b, 'es'),
+  );
 }
 
 export function countActiveFilters(filters: ProductFilters): number {
@@ -61,5 +76,16 @@ export function countActiveFilters(filters: ProductFilters): number {
     filters.minPrice !== null,
     filters.maxPrice !== null,
     filters.inStockOnly,
-  ].filter(Boolean).length;
+    filters.onSaleOnly,
+  ].filter(Boolean).length + filters.colors.length;
+}
+
+export function getColors(products: readonly Product[]): string[] {
+  return [...new Set(products.flatMap((product) => (product.color ? [product.color] : [])))].sort((a, b) => a.localeCompare(b, 'es'));
+}
+
+export function getPriceBounds(products: readonly Product[]): { min: number; max: number } {
+  if (products.length === 0) return { min: 0, max: 0 };
+  const prices = products.map((product) => product.price);
+  return { min: Math.min(...prices), max: Math.max(...prices) };
 }

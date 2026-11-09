@@ -4,6 +4,8 @@ import { createCognitoAuthGateway } from '@/features/auth/infrastructure/cognito
 import { createLocalAuthGateway } from '@/features/auth/infrastructure/localAuthGateway';
 import { createAmplifyProductRepository } from '@/features/catalog/infrastructure/amplifyProductRepository';
 import { createLocalProductRepository } from '@/features/catalog/infrastructure/localProductRepository';
+import { createAmplifyFavoritesRepository } from '@/features/favorites/infrastructure/amplifyFavoritesRepository';
+import { createLocalFavoritesRepository } from '@/features/favorites/infrastructure/localFavoritesRepository';
 import { createAmplifyOrderRepository } from '@/features/orders/infrastructure/amplifyOrderRepository';
 import { createLocalOrderRepository } from '@/features/orders/infrastructure/localOrderRepository';
 import type { DataSource, Services } from './services';
@@ -15,6 +17,7 @@ export function createAmplifyServices(): Services {
     products: createAmplifyProductRepository(),
     orders: createAmplifyOrderRepository(),
     assistant: createBedrockAssistantGateway(),
+    favorites: createAmplifyFavoritesRepository(),
   };
 }
 
@@ -26,6 +29,7 @@ export function createLocalServices(): Services {
     products,
     orders: createLocalOrderRepository(products),
     assistant: createLocalAssistantGateway(products),
+    favorites: createLocalFavoritesRepository(),
   };
 }
 

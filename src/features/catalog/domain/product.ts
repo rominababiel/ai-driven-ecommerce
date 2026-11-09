@@ -9,6 +9,10 @@ export interface Product {
   imageUrl: string;
   stock: number;
   rating: number;
+  compareAtPrice?: number | null;
+  isNew?: boolean | null;
+  color?: string | null;
+  hoverImageUrl?: string | null;
 }
 
 export type ProductInput = Omit<Product, 'id'>;
@@ -23,6 +27,17 @@ export interface ProductRepository {
 
 export function isInStock(product: Pick<Product, 'stock'>): boolean {
   return product.stock > 0;
+}
+
+export const LOW_STOCK_THRESHOLD = 3;
+
+export function isLowStock(product: Pick<Product, 'stock'>): boolean {
+  return product.stock > 0 && product.stock <= LOW_STOCK_THRESHOLD;
+}
+
+export function discountPercent(product: Pick<Product, 'price' | 'compareAtPrice'>): number | null {
+  if (!product.compareAtPrice || product.compareAtPrice <= product.price) return null;
+  return Math.round((1 - product.price / product.compareAtPrice) * 100);
 }
 
 export function validateProductInput(input: ProductInput): FieldErrors<ProductInput> {

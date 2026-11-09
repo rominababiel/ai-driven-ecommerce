@@ -78,9 +78,9 @@ export function AdminProductsPage() {
           }
         />
       ) : (
-        <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-zinc-200">
+        <div className="overflow-x-auto rounded-md bg-surface ring-1 ring-border">
           <table className="w-full min-w-xl text-left text-sm">
-            <thead className="border-b border-zinc-200 text-xs uppercase tracking-wide text-zinc-500">
+            <thead className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 font-medium">Producto</th>
                 <th className="px-4 py-3 font-medium">Categoría</th>
@@ -89,22 +89,22 @@ export function AdminProductsPage() {
                 <th className="px-4 py-3"><span className="sr-only">Acciones</span></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-border">
               {catalog.map((product) => (
                 <tr key={product.id}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <img src={product.imageUrl} alt="" className="size-10 rounded-lg bg-zinc-100 object-cover" />
-                      <span className="font-medium text-zinc-900">{product.name}</span>
+                      <img src={product.imageUrl} alt="" className="size-10 rounded-lg bg-muted object-cover" />
+                      <span className="font-medium text-foreground">{product.name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-zinc-600">{product.category}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{product.category}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{formatPrice(product.price)}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{product.stock}</td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
                       <Button variant="ghost" size="sm" onClick={() => setEditor({ mode: 'edit', product })}>Editar</Button>
-                      <Button variant="ghost" size="sm" className="text-red-600" onClick={() => handleDelete(product)}>Eliminar</Button>
+                      <Button variant="ghost" size="sm" className="text-danger" onClick={() => handleDelete(product)}>Eliminar</Button>
                     </div>
                   </td>
                 </tr>

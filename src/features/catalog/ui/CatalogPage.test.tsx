@@ -1,44 +1,54 @@
-import { screen, within } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { RootLayout } from '@/app/layout/RootLayout';
 import { CartPage } from '@/features/cart/ui/CartPage';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { CatalogPage } from './CatalogPage';
 
 const routes = [
-  { path: '/', element: <CatalogPage /> },
-  { path: '/cart', element: <CartPage /> },
+  {
+    element: <RootLayout />,
+    children: [
+      { path: '/catalogo', element: <CatalogPage /> },
+      { path: '/cart', element: <CartPage /> },
+    ],
+  },
 ];
 
 describe('CatalogPage', () => {
-  it('filters the catalog by search query', async () => {
-    const user = userEvent.setup();
-    renderWithProviders({ routes });
+  it('filters the catalog by search query from the URL', async () => {
+    renderWithProviders({ routes, initialPath: '/catalogo?q=rompeviento' });
 
-    expect(await screen.findByText('12 productos')).toBeInTheDocument();
-    await user.type(screen.getByLabelText('Buscar'), 'botas');
-
-    expect(screen.getByText('1 producto')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Botas Chelsea de Cuero' })).toBeInTheDocument();
+    expect(await screen.findByText('1 productos')).toBeInTheDocument();
+    expect(screen.getAllByText('Rompeviento Faro').length).toBeGreaterThan(0);
   });
 
-  it('filters by category', async () => {
+  it('filters by category chip', async () => {
     const user = userEvent.setup();
-    renderWithProviders({ routes });
+    renderWithProviders({ routes, initialPath: '/catalogo' });
 
-    await screen.findByText('12 productos');
-    await user.click(within(screen.getByRole('group', { name: 'Categoría' })).getByLabelText('Abrigos'));
+    await screen.findByText('10 productos');
+    await user.click(screen.getByRole('button', { name: 'Buzos y camperas' }));
 
-    expect(screen.getByText('3 productos')).toBeInTheDocument();
+    expect(await screen.findByText('2 productos')).toBeInTheDocument();
   });
 
-  it('adds products to the cart', async () => {
-    const user = userEvent.setup();
-    const { router } = renderWithProviders({ routes });
+  it('shows only discounted products in Sale', async () => {
+    renderWithProviders({ routes, initialPath: '/catalogo?cat=Sale' });
+    expect(await screen.findByText('2 productos')).toBeInTheDocument();
+  });
 
-    await user.click(await screen.findByRole('button', { name: 'Agregar Botas Chelsea de Cuero al carrito' }));
+  it('adds products to the cart with quick add', async () => {
+    const user = userEvent.setup();
+    const { router } = renderWithProviders({ routes, initialPath: '/catalogo' });
+
+    await screen.findByText('10 productos');
+    const [quickAdd] = screen.getAllByRole('button', { name: 'Agregar rápido' });
+    await user.click(quickAdd);
+    expect(await screen.findByText('¡Agregado al carrito!')).toBeInTheDocument();
+
     await router.navigate('/cart');
-
-    expect(await screen.findByRole('link', { name: 'Botas Chelsea de Cuero' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Finalizar compra' })).toBeInTheDocument();
   });
 });

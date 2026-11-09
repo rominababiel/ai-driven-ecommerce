@@ -1,23 +1,27 @@
+import { cn } from '@/shared/lib/cn';
+import { Icon } from '@/shared/ui/Icon';
+
 interface QuantityStepperProps {
   value: number;
   max: number;
-  min?: number;
-  label: string;
   onChange(value: number): void;
+  size?: 'sm' | 'md' | 'lg';
+  bordered?: 'strong' | 'soft';
 }
 
-export function QuantityStepper({ value, max, min = 1, label, onChange }: QuantityStepperProps) {
-  const buttonClass = 'flex size-9 items-center justify-center text-lg text-zinc-700 hover:bg-zinc-100 disabled:text-zinc-300';
+const SIZES = { sm: 'size-[34px] text-xs', md: 'size-10 text-sm', lg: 'h-[52px] w-11 text-base' };
+
+export function QuantityStepper({ value, max, onChange, size = 'md', bordered = 'strong' }: QuantityStepperProps) {
   return (
-    <div className="inline-flex items-center rounded-lg ring-1 ring-inset ring-zinc-300" role="group" aria-label={label}>
-      <button type="button" className={buttonClass} disabled={value <= min} onClick={() => onChange(value - 1)} aria-label="Disminuir cantidad">
-        −
+    <div className={cn('flex flex-none items-center rounded-xs border', bordered === 'strong' ? 'border-border-strong' : 'border-border')}>
+      <button type="button" aria-label="Restar" disabled={value <= 1} onClick={() => onChange(value - 1)} className={cn('grid cursor-pointer place-items-center disabled:cursor-default disabled:text-border-strong', SIZES[size])}>
+        <Icon name="minus" />
       </button>
-      <span className="w-8 text-center text-sm font-medium tabular-nums" aria-live="polite">
+      <span aria-live="polite" className="w-7 text-center font-mono text-sm font-medium">
         {value}
       </span>
-      <button type="button" className={buttonClass} disabled={value >= max} onClick={() => onChange(value + 1)} aria-label="Aumentar cantidad">
-        +
+      <button type="button" aria-label="Sumar" disabled={value >= max} onClick={() => onChange(value + 1)} className={cn('grid cursor-pointer place-items-center disabled:cursor-default disabled:text-border-strong', SIZES[size])}>
+        <Icon name="plus" />
       </button>
     </div>
   );

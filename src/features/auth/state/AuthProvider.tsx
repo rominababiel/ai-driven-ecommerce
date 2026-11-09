@@ -13,8 +13,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     auth.currentUser().then((user) => {
       if (active) dispatch({ type: 'resolved', user });
     });
+    const unsubscribe = auth.subscribe((user) => {
+      if (active) dispatch({ type: 'resolved', user });
+    });
     return () => {
       active = false;
+      unsubscribe();
     };
   }, [auth]);
 
@@ -28,6 +32,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       signUp: (credentials: Credentials) => auth.signUp(credentials),
       confirmSignUp: (email: string, code: string) => auth.confirmSignUp(email, code),
+      requestPasswordReset: (email: string) => auth.requestPasswordReset(email),
+      confirmPasswordReset: (email: string, code: string, newPassword: string) => auth.confirmPasswordReset(email, code, newPassword),
+      signInWithGoogle: () => auth.signInWithGoogle(),
       async signOut() {
         await auth.signOut();
         dispatch({ type: 'signedOut' });

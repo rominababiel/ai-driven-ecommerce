@@ -6,7 +6,7 @@ import type { CartTotals } from '../domain/pricing';
 export interface CartContextValue {
   items: CartItem[];
   totals: CartTotals;
-  add(product: Product, quantity?: number): void;
+  add(product: Product, quantity?: number, size?: string | null): void;
   remove(productId: string): void;
   setQuantity(productId: string, quantity: number): void;
   clear(): void;

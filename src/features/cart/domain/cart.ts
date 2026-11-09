@@ -7,24 +7,30 @@ export interface CartItem {
   imageUrl: string;
   quantity: number;
   stock: number;
+  size?: string | null;
+  color?: string | null;
 }
 
 export type CartAction =
-  | { type: 'add'; product: Product; quantity: number }
+  | { type: 'add'; product: Product; quantity: number; size?: string | null }
   | { type: 'remove'; productId: string }
   | { type: 'setQuantity'; productId: string; quantity: number }
   | { type: 'clear' };
+
+export function describeItem(item: Pick<CartItem, 'size' | 'color'>): string {
+  return [item.size ? `Talle ${item.size}` : 'Talle único', item.color].filter(Boolean).join(' · ');
+}
 
 function clampQuantity(quantity: number, stock: number): number {
   return Math.max(0, Math.min(Math.floor(quantity), stock));
 }
 
-function addProduct(items: CartItem[], product: Product, quantity: number): CartItem[] {
+function addProduct(items: CartItem[], product: Product, quantity: number, size: string | null = null): CartItem[] {
   const existing = items.find((item) => item.productId === product.id);
   if (existing) {
     return items.map((item) =>
       item.productId === product.id
-        ? { ...item, price: product.price, stock: product.stock, quantity: clampQuantity(item.quantity + quantity, product.stock) }
+        ? { ...item, price: product.price, stock: product.stock, size: size ?? item.size ?? null, quantity: clampQuantity(item.quantity + quantity, product.stock) }
         : item,
     );
   }
@@ -39,6 +45,8 @@ function addProduct(items: CartItem[], product: Product, quantity: number): Cart
       imageUrl: product.imageUrl,
       quantity: initialQuantity,
       stock: product.stock,
+      size,
+      color: product.color ?? null,
     },
   ];
 }
@@ -46,7 +54,7 @@ function addProduct(items: CartItem[], product: Product, quantity: number): Cart
 export function cartReducer(items: CartItem[], action: CartAction): CartItem[] {
   switch (action.type) {
     case 'add':
-      return addProduct(items, action.product, action.quantity);
+      return addProduct(items, action.product, action.quantity, action.size);
     case 'remove':
       return items.filter((item) => item.productId !== action.productId);
     case 'setQuantity':

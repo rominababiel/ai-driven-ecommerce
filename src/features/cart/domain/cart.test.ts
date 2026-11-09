@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildProduct } from '@/test/fixtures';
 import { cartReducer } from './cart';
-import { calculateTotals, SHIPPING_FEE } from './pricing';
+import { calculateTotals, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from './pricing';
 
 describe('cartReducer', () => {
   const product = buildProduct({ id: 'a', price: 20, stock: 3 });
@@ -36,15 +36,24 @@ describe('cartReducer', () => {
 
 describe('calculateTotals', () => {
   it('charges shipping below the free shipping threshold', () => {
-    const totals = calculateTotals([{ price: 10.5, quantity: 2 }]);
-    expect(totals).toEqual({ itemCount: 2, subtotal: 21, shipping: SHIPPING_FEE, total: 30.99 });
+    const totals = calculateTotals([{ price: 30000, quantity: 2 }]);
+    expect(totals).toEqual({ itemCount: 2, subtotal: 60000, shipping: SHIPPING_FEE, discount: 0, total: 60000 + SHIPPING_FEE });
   });
 
   it('grants free shipping above the threshold', () => {
-    expect(calculateTotals([{ price: 60, quantity: 2 }]).shipping).toBe(0);
+    expect(calculateTotals([{ price: FREE_SHIPPING_THRESHOLD / 2, quantity: 2 }]).shipping).toBe(0);
   });
 
   it('returns zero totals for an empty cart', () => {
-    expect(calculateTotals([])).toEqual({ itemCount: 0, subtotal: 0, shipping: 0, total: 0 });
+    expect(calculateTotals([])).toEqual({ itemCount: 0, subtotal: 0, shipping: 0, discount: 0, total: 0 });
+  });
+
+  it('skips shipping for store pickup', () => {
+    expect(calculateTotals([{ price: 10000, quantity: 1 }], { delivery: 'PICKUP', payment: 'CARD' }).shipping).toBe(0);
+  });
+
+  it('applies the transfer discount to the subtotal', () => {
+    const totals = calculateTotals([{ price: 100000, quantity: 1 }], { delivery: 'HOME', payment: 'TRANSFER' });
+    expect(totals).toMatchObject({ discount: 15000, shipping: SHIPPING_FEE, total: 85000 + SHIPPING_FEE });
   });
 });

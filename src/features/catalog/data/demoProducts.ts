@@ -1,18 +1,19 @@
 import type { Product } from '../domain/product';
 
-const image = (seed: string) => `https://picsum.photos/seed/${seed}/600/600`;
+const photo = (id: number) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=800&h=1000`;
 
 export const DEMO_PRODUCTS: Product[] = [
-  { id: 'p-01', name: 'Remera Básica Algodón Orgánico', description: 'Remera de corte regular en algodón orgánico peinado, suave y respirable.', price: 18.9, category: 'Remeras', imageUrl: image('remera-basica'), stock: 40, rating: 4.5 },
-  { id: 'p-02', name: 'Remera Oversize Estampada', description: 'Remera oversize con estampa frontal y hombros caídos, estilo urbano.', price: 24.5, category: 'Remeras', imageUrl: image('remera-oversize'), stock: 25, rating: 4.3 },
-  { id: 'p-03', name: 'Jean Recto Clásico', description: 'Jean de tiro medio y pierna recta en denim rígido con lavado vintage.', price: 49.9, category: 'Pantalones', imageUrl: image('jean-recto'), stock: 18, rating: 4.6 },
-  { id: 'p-04', name: 'Pantalón Cargo Urbano', description: 'Pantalón cargo de gabardina con bolsillos laterales y puño ajustable.', price: 44, category: 'Pantalones', imageUrl: image('cargo-urbano'), stock: 0, rating: 4.1 },
-  { id: 'p-05', name: 'Jogger de Algodón', description: 'Jogger de frisa liviana con cintura elastizada y cordón.', price: 32.5, category: 'Pantalones', imageUrl: image('jogger-algodon'), stock: 22, rating: 4.4 },
-  { id: 'p-06', name: 'Zapatillas Urbanas Blancas', description: 'Zapatillas de cuero sintético blancas con suela de goma, combinan con todo.', price: 79.9, category: 'Calzado', imageUrl: image('zapatillas-blancas'), stock: 15, rating: 4.7 },
-  { id: 'p-07', name: 'Botas Chelsea de Cuero', description: 'Botas Chelsea de cuero genuino con elásticos laterales y suela track.', price: 129, category: 'Calzado', imageUrl: image('botas-chelsea'), stock: 6, rating: 4.8 },
-  { id: 'p-08', name: 'Campera de Jean', description: 'Campera de denim clásica con botones metálicos y bolsillos en el pecho.', price: 69.9, category: 'Abrigos', imageUrl: image('campera-jean'), stock: 10, rating: 4.5 },
-  { id: 'p-09', name: 'Buzo Hoodie Essential', description: 'Buzo con capucha de frisa invisible, bolsillo canguro y puños acanalados.', price: 39.9, category: 'Abrigos', imageUrl: image('hoodie-essential'), stock: 30, rating: 4.6 },
-  { id: 'p-10', name: 'Tapado de Paño', description: 'Tapado largo de paño con solapa clásica, ideal para el invierno.', price: 149, category: 'Abrigos', imageUrl: image('tapado-pano'), stock: 3, rating: 4.4 },
-  { id: 'p-11', name: 'Gorra Dad Hat', description: 'Gorra de gabardina lavada con visera curva y cierre regulable.', price: 15.9, category: 'Accesorios', imageUrl: image('gorra-dad'), stock: 50, rating: 4.2 },
-  { id: 'p-12', name: 'Mochila Canvas Urban', description: 'Mochila de lona encerada con compartimento para notebook y detalles de cuero.', price: 54, category: 'Accesorios', imageUrl: image('mochila-canvas'), stock: 12, rating: 4.6 },
+  { id: 'p-01', name: 'Buzo con capucha Norte', category: 'Buzos y camperas', price: 68900, isNew: true, stock: 14, color: 'Gris', rating: 4.6, imageUrl: photo(7869555), hoverImageUrl: photo(7869666), description: 'Frisa técnica liviana que abriga sin dar calor de más. Capucha ajustable, puños con orificio para el pulgar y bolsillo canguro.' },
+  { id: 'p-02', name: 'Calza técnica Ruta', category: 'Calzas', price: 39900, compareAtPrice: 49900, stock: 22, color: 'Grafito', rating: 4.7, imageUrl: photo(8567597), hoverImageUrl: photo(6049164), description: 'Lycra de compresión media, tiro alto y bolsillo lateral para el celu. Secado rápido para correr o entrenar.' },
+  { id: 'p-03', name: 'Rompeviento Faro', category: 'Buzos y camperas', price: 94500, isNew: true, stock: 2, color: 'Negro', rating: 4.8, imageUrl: photo(8497715), hoverImageUrl: photo(5039659), description: 'Nylon ripstop repelente al agua con vivos reflectivos 360°. Ideal para correr de noche. Se guarda en su propio bolsillo.' },
+  { id: 'p-04', name: 'Remera técnica Plaza', category: 'Remeras y tops', price: 28900, stock: 0, color: 'Gris', rating: 4.3, imageUrl: photo(4719931), hoverImageUrl: photo(4719921), description: 'Tejido dry-fit respirable con costuras planas que no rozan. Para correr, caminar o ir al gimnasio.' },
+  { id: 'p-05', name: 'Jogger técnico Bajo', category: 'Joggers y pantalones', price: 61500, compareAtPrice: 72000, stock: 9, color: 'Verde agua', rating: 4.5, imageUrl: photo(9775733), description: 'Tela técnica elastizada, puño con cierre y cintura con cordón. Para caminar, entrenar o el día a día.' },
+  { id: 'p-06', name: 'Top deportivo Pulso', category: 'Remeras y tops', price: 32900, isNew: true, stock: 11, color: 'Negro', rating: 4.4, imageUrl: photo(3764154), hoverImageUrl: photo(10078261), description: 'Sostén medio, espalda cruzada y tela de secado rápido. Para running, funcional o yoga.' },
+  { id: 'p-07', name: 'Short running Costa', category: 'Shorts', price: 34900, stock: 3, color: 'Negro', rating: 4.5, imageUrl: photo(5037354), hoverImageUrl: photo(8520627), description: 'Short 5" con calza interna y bolsillo trasero con cierre para llaves.' },
+  { id: 'p-08', name: 'Musculosa running Oeste', category: 'Remeras y tops', price: 26900, stock: 8, color: 'Rojo', rating: 4.6, imageUrl: photo(7523366), hoverImageUrl: photo(3760259), description: 'Musculosa ultraliviana con malla en la espalda para ventilar en entrenamientos y carreras.' },
+  { id: 'p-09', name: 'Calza ciclista Sur', category: 'Shorts', price: 36400, isNew: true, stock: 6, color: 'Negro', rating: 4.4, imageUrl: photo(3771834), hoverImageUrl: photo(3771836), description: 'Calza corta de compresión con cintura alta y bandas antideslizantes. Para andar en bici o entrenar.' },
+  { id: 'p-10', name: 'Gorra running Obelisco', category: 'Accesorios', price: 22900, stock: 0, color: 'Blanco', rating: 4.2, imageUrl: photo(14742784), hoverImageUrl: photo(13424627), description: 'Gorra liviana de tela técnica con visera curva y banda que absorbe la transpiración.' },
 ];
+
+export const HERO_IMAGE = 'https://images.pexels.com/photos/29840338/pexels-photo-29840338.jpeg?auto=compress&cs=tinysrgb&fit=crop';

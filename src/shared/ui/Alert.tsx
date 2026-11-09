@@ -1,16 +1,18 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/shared/lib/cn';
+import { Icon } from './Icon';
 
 const tones = {
-  error: 'bg-red-50 text-red-800 ring-red-200',
-  success: 'bg-emerald-50 text-emerald-800 ring-emerald-200',
-  info: 'bg-violet-50 text-violet-800 ring-violet-200',
+  error: { className: 'bg-danger-soft text-danger', icon: 'x-circle' },
+  success: { className: 'bg-success-soft text-success', icon: 'check-circle' },
+  info: { className: 'bg-ai-soft text-ai-soft-foreground', icon: 'sparkle' },
 };
 
 export function Alert({ tone = 'info', children }: { tone?: keyof typeof tones; children: ReactNode }) {
   return (
-    <div role={tone === 'error' ? 'alert' : 'status'} className={cn('rounded-lg px-4 py-3 text-sm ring-1 ring-inset', tones[tone])}>
-      {children}
+    <div role={tone === 'error' ? 'alert' : 'status'} className={cn('flex gap-2.5 px-3.5 py-3 text-sm leading-snug', tones[tone].className)}>
+      <Icon name={tones[tone].icon} fill className="flex-none text-xl" />
+      <div>{children}</div>
     </div>
   );
 }

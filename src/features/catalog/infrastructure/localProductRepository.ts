@@ -3,7 +3,7 @@ import { DEMO_PRODUCTS } from '../data/demoProducts';
 import type { Product, ProductRepository } from '../domain/product';
 
 export function createLocalProductRepository(seed: readonly Product[] = DEMO_PRODUCTS): ProductRepository {
-  const store = createPersistentStore<Product[]>('shop.products', [...seed]);
+  const store = createPersistentStore<Product[]>('outfit.products.v2', [...seed]);
 
   const findOrThrow = (id: string) => {
     const product = store.read().find((item) => item.id === id);

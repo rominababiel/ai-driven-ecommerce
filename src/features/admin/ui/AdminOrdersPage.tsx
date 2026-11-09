@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { ORDER_STATUSES, ORDER_STATUS_LABELS, type Order, type OrderStatus } from '@/features/orders/domain/order';
-import { formatOrderDate, shortOrderId } from '@/features/orders/ui/formatDate';
+import { formatOrderDate } from '@/features/orders/ui/formatDate';
+import { shortOrderId } from '@/features/orders/domain/order';
 import { OrderStatusBadge } from '@/features/orders/ui/OrderStatusBadge';
 import { useServices } from '@/services/ServicesContext';
 import { useAsync } from '@/shared/hooks/useAsync';
@@ -37,9 +38,9 @@ export function AdminOrdersPage() {
   return (
     <div className="flex flex-col gap-4">
       {actionError && <Alert tone="error">{actionError}</Alert>}
-      <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-zinc-200">
+      <div className="overflow-x-auto rounded-md bg-surface ring-1 ring-border">
         <table className="w-full min-w-2xl text-left text-sm">
-          <thead className="border-b border-zinc-200 text-xs uppercase tracking-wide text-zinc-500">
+          <thead className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Pedido</th>
               <th className="px-4 py-3 font-medium">Cliente</th>
@@ -48,22 +49,22 @@ export function AdminOrdersPage() {
               <th className="px-4 py-3 font-medium">Estado</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100">
+          <tbody className="divide-y divide-border">
             {data.map((order) => (
               <tr key={order.id}>
                 <td className="px-4 py-3 font-mono text-xs">#{shortOrderId(order.id)}</td>
                 <td className="px-4 py-3">
-                  <p className="text-zinc-900">{order.shipping.fullName}</p>
-                  <p className="text-xs text-zinc-500">{order.shipping.email}</p>
+                  <p className="text-foreground">{order.shipping.fullName}</p>
+                  <p className="text-xs text-muted-foreground">{order.shipping.email}</p>
                 </td>
-                <td className="px-4 py-3 text-zinc-600">{formatOrderDate(order.createdAt)}</td>
+                <td className="px-4 py-3 text-muted-foreground">{formatOrderDate(order.createdAt)}</td>
                 <td className="px-4 py-3 text-right tabular-nums">{formatPrice(order.total)}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <OrderStatusBadge status={order.status} />
                     <select
                       aria-label={`Cambiar estado del pedido ${shortOrderId(order.id)}`}
-                      className="h-8 rounded-md border border-zinc-300 bg-white px-2 text-xs"
+                      className="h-8 rounded-md border border-border bg-surface px-2 text-xs"
                       value={order.status}
                       disabled={updatingId === order.id}
                       onChange={(e) => changeStatus(order, e.target.value as OrderStatus)}

@@ -1,14 +1,21 @@
 import {
+  confirmResetPassword,
   confirmSignUp,
   fetchAuthSession,
   fetchUserAttributes,
   getCurrentUser,
+  resetPassword,
   signIn,
+  signInWithRedirect,
   signOut,
   signUp,
 } from 'aws-amplify/auth';
+import 'aws-amplify/auth/enable-oauth-listener';
+import { Hub } from 'aws-amplify/utils';
 import { ADMIN_GROUP } from '../../../../amplify/shared/constants';
 import type { AuthGateway, User } from '../domain/user';
+
+const SESSION_EVENTS = new Set(['signedIn', 'signedOut', 'signInWithRedirect', 'tokenRefresh_failure']);
 
 const SIGN_IN_STEP_MESSAGES: Record<string, string> = {
   CONFIRM_SIGN_UP: 'Debes confirmar tu cuenta con el código enviado a tu correo',
@@ -53,8 +60,23 @@ export function createCognitoAuthGateway(): AuthGateway {
     async confirmSignUp(email, code) {
       await confirmSignUp({ username: email.trim(), confirmationCode: code.trim() });
     },
+    async requestPasswordReset(email) {
+      await resetPassword({ username: email.trim() });
+    },
+    async confirmPasswordReset(email, code, newPassword) {
+      await confirmResetPassword({ username: email.trim(), confirmationCode: code.trim(), newPassword });
+    },
+    async signInWithGoogle() {
+      await signInWithRedirect({ provider: 'Google' });
+    },
     async signOut() {
       await signOut();
+    },
+    subscribe(listener) {
+      return Hub.listen('auth', ({ payload }) => {
+        if (!SESSION_EVENTS.has(payload.event)) return;
+        resolveUser().then(listener, () => listener(null));
+      });
     },
   };
 }

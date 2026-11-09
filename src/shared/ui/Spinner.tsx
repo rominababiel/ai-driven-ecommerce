@@ -14,7 +14,7 @@ export function Spinner({ size = 'md', className }: { size?: keyof typeof sizes;
 
 export function PageSpinner() {
   return (
-    <div className="flex min-h-64 items-center justify-center text-violet-600">
+    <div className="flex min-h-64 items-center justify-center text-foreground">
       <Spinner size="lg" />
     </div>
   );
