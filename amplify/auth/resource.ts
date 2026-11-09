@@ -1,5 +1,6 @@
 import { defineAuth, secret } from '@aws-amplify/backend';
 import { ADMIN_GROUP } from '../shared/constants';
+import { postConfirmation } from './post-confirmation/resource';
 
 const APP_URLS = ['http://localhost:5173/', 'https://main.d1hdx6f49r2alg.amplifyapp.com/'];
 
@@ -18,4 +19,6 @@ export const auth = defineAuth({
     },
   },
   groups: [ADMIN_GROUP],
+  triggers: { postConfirmation },
+  access: (allow) => [allow.resource(postConfirmation).to(['addUserToGroup'])],
 });
