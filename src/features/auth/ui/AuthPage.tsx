@@ -347,7 +347,7 @@ export function AuthPage({ initialMode }: { initialMode: 'login' | 'register' })
           </span>
           <h1 className="display text-[40px] leading-[0.9]">Revisá tu mail</h1>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Te mandamos un código de 6 dígitos a <b className="text-foreground">{email}</b>. Si no lo ves, revisá en correo no deseado: llega de no-reply@verificationemail.com.
+            Te mandamos un código de 6 dígitos a <b className="text-foreground">{email}</b>. Si no lo ves, revisá en correo no deseado.
           </p>
           <CodeInput
             value={code}
