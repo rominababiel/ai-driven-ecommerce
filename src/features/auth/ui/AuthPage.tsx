@@ -6,6 +6,7 @@ import { cn } from '@/shared/lib/cn';
 import { toErrorMessage } from '@/shared/lib/errors';
 import { EMAIL_PATTERN } from '@/shared/lib/validation';
 import { Icon } from '@/shared/ui/Icon';
+import { PASSWORD_RULES, passwordError } from '../domain/password';
 import { DEMO_ACCOUNTS } from '../infrastructure/localAuthGateway';
 import { useAuth } from '../state/AuthContext';
 
@@ -17,10 +18,6 @@ export interface AuthRedirectState {
 }
 
 const CODE_LENGTH = 6;
-
-function passwordScore(password: string): number {
-  return [password.length >= 8, /\d/.test(password), /[A-Z]/.test(password), /[^A-Za-z0-9]/.test(password)].filter(Boolean).length;
-}
 
 function Field({ label, aside, children }: { label: string; aside?: ReactNode; children: ReactNode }) {
   return (
@@ -125,7 +122,8 @@ export function AuthPage({ initialMode }: { initialMode: 'login' | 'register' })
   const register = (event: FormEvent) => {
     event.preventDefault();
     if (!EMAIL_PATTERN.test(email)) return setError('Ingresá un email válido.');
-    if (passwordScore(password) < 2) return setError('Mínimo 8 caracteres con un número.');
+    const invalidPassword = passwordError(password);
+    if (invalidPassword) return setError(invalidPassword);
     void run(async () => {
       const { needsConfirmation } = await signUp({ email, password });
       if (needsConfirmation) {
@@ -162,7 +160,8 @@ export function AuthPage({ initialMode }: { initialMode: 'login' | 'register' })
   const resetPassword = (event: FormEvent) => {
     event.preventDefault();
     if (code.length < CODE_LENGTH) return setError('Completá los 6 dígitos.');
-    if (passwordScore(password) < 2) return setError('Mínimo 8 caracteres con un número.');
+    const invalidPassword = passwordError(password);
+    if (invalidPassword) return setError(invalidPassword);
     void run(async () => {
       await confirmPasswordReset(email, code, password);
       setPassword('');
@@ -189,16 +188,18 @@ export function AuthPage({ initialMode }: { initialMode: 'login' | 'register' })
     </>
   );
 
-  const score = passwordScore(password);
   const strengthMeter = (
-    <>
-      <div aria-hidden="true" className="grid grid-cols-4 gap-1">
-        {[1, 2, 3, 4].map((level) => (
-          <span key={level} className={cn('h-[3px]', score >= level ? 'bg-success' : 'bg-border')} />
-        ))}
-      </div>
-      <span className="text-xs text-muted-foreground">Mínimo 8 caracteres con un número.</span>
-    </>
+    <ul aria-label="Requisitos de la contraseña" className="flex flex-wrap gap-x-3 gap-y-1">
+      {PASSWORD_RULES.map((rule) => {
+        const met = rule.test(password);
+        return (
+          <li key={rule.label} className={cn('flex items-center gap-1 text-xs', met ? 'text-success' : 'text-muted-foreground')}>
+            <Icon name={met ? 'check-circle' : 'circle'} className="text-sm" />
+            {rule.label}
+          </li>
+        );
+      })}
+    </ul>
   );
   const passwordInput = (
     <div className="field flex items-center justify-between pr-1.5 focus-within:border-foreground">
