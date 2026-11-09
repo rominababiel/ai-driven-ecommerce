@@ -4,8 +4,8 @@ import { useShopUI } from '@/app/shop/ShopUIContext';
 import { Alert } from '@/shared/ui/Alert';
 import { Icon } from '@/shared/ui/Icon';
 import { GridSkeleton } from '@/shared/ui/StatusBlock';
-import { HERO_IMAGE } from '../data/demoProducts';
-import { getCategories } from '../domain/filters';
+import { CATEGORY_IMAGES, HERO_IMAGE } from '../data/demoProducts';
+import { CATEGORY_ORDER } from '../domain/filters';
 import type { Product } from '../domain/product';
 import { useCatalog } from '../state/useCatalog';
 import { ProductGrid } from './ProductCard';
@@ -22,6 +22,7 @@ interface ProductSectionProps {
 }
 
 function ProductSection({ title, products, status, error }: ProductSectionProps) {
+  if (status === 'success' && products.length === 0) return null;
   return (
     <section className="page flex flex-col gap-5 pt-12">
       <div className="flex items-baseline justify-between gap-3">
@@ -46,15 +47,15 @@ export function HomePage() {
     .filter((product) => product.stock > 0 && !product.isNew)
     .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
     .slice(0, ROW_SIZE);
-  const categories = getCategories(products).map((category) => ({
+  const categories = CATEGORY_ORDER.map((category) => ({
     category,
-    image: products.find((product) => product.category === category)?.imageUrl,
+    image: CATEGORY_IMAGES[category] ?? products.find((product) => product.category === category)?.imageUrl,
   }));
 
   return (
     <>
       <section className="relative aspect-[4/5] overflow-hidden bg-photo lg:aspect-[16/7]">
-        <img src={`${HERO_IMAGE}&w=1800&h=1125`} alt="" className="absolute inset-0 size-full object-cover" />
+        <img src={HERO_IMAGE.src} srcSet={HERO_IMAGE.srcSet} sizes={HERO_IMAGE.sizes} alt="" fetchPriority="high" className="absolute inset-0 size-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[oklch(0.16_0.01_60/0.62)] to-transparent to-60%" />
         <div className="page absolute inset-x-0 bottom-0 flex flex-col gap-4 pb-6 text-primary-foreground lg:pb-12">
           <span className="font-mono text-xs font-medium tracking-[0.08em] uppercase">Drop 04 — Primavera / Verano 26</span>

@@ -16,4 +16,20 @@ export const DEMO_PRODUCTS: Product[] = [
   { id: 'p-10', name: 'Gorra running Obelisco', category: 'Accesorios', price: 22900, stock: 0, color: 'Blanco', rating: 4.2, imageUrl: photo(14742784), hoverImageUrl: photo(13424627), description: 'Gorra liviana de tela técnica con visera curva y banda que absorbe la transpiración.' },
 ];
 
-export const HERO_IMAGE = 'https://images.pexels.com/photos/29840338/pexels-photo-29840338.jpeg?auto=compress&cs=tinysrgb&fit=crop';
+export const CATEGORY_IMAGES: Record<string, string> = {
+  'Buzos y camperas': photo(7869555),
+  Calzas: photo(8567597),
+  'Remeras y tops': photo(4719931),
+  'Joggers y pantalones': photo(9775733),
+  Shorts: photo(5037354),
+  Accesorios: photo(14742784),
+};
+
+const HERO_PHOTO = 'https://images.pexels.com/photos/29840338/pexels-photo-29840338.jpeg?auto=compress&cs=tinysrgb';
+const HERO_WIDTHS = [1280, 1920, 2560, 3200];
+
+export const HERO_IMAGE = {
+  src: `${HERO_PHOTO}&w=1920`,
+  srcSet: HERO_WIDTHS.map((width) => `${HERO_PHOTO}&w=${width} ${width}w`).join(', '),
+  sizes: '(max-width: 1023px) 250vw, 100vw',
+};
