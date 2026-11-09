@@ -39,6 +39,9 @@ export function createLocalAuthGateway(): AuthGateway {
     async confirmSignUp() {
       return;
     },
+    async resendSignUpCode() {
+      return;
+    },
     async requestPasswordReset() {
       return;
     },

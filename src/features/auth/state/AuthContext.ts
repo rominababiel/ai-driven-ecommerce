@@ -6,6 +6,7 @@ export type AuthContextValue = AuthState & {
   signIn(credentials: Credentials): Promise<User>;
   signUp(credentials: Credentials): Promise<SignUpResult>;
   confirmSignUp(email: string, code: string): Promise<void>;
+  resendSignUpCode(email: string): Promise<void>;
   requestPasswordReset(email: string): Promise<void>;
   confirmPasswordReset(email: string, code: string, newPassword: string): Promise<void>;
   signInWithGoogle(): Promise<void>;

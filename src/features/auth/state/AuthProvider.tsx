@@ -32,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       signUp: (credentials: Credentials) => auth.signUp(credentials),
       confirmSignUp: (email: string, code: string) => auth.confirmSignUp(email, code),
+      resendSignUpCode: (email: string) => auth.resendSignUpCode(email),
       requestPasswordReset: (email: string) => auth.requestPasswordReset(email),
       confirmPasswordReset: (email: string, code: string, newPassword: string) => auth.confirmPasswordReset(email, code, newPassword),
       signInWithGoogle: () => auth.signInWithGoogle(),

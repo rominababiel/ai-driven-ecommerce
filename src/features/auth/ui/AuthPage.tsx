@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useShopUI } from '@/app/shop/ShopUIContext';
 import { useServices } from '@/services/ServicesContext';
@@ -7,6 +7,7 @@ import { toErrorMessage } from '@/shared/lib/errors';
 import { EMAIL_PATTERN } from '@/shared/lib/validation';
 import { Icon } from '@/shared/ui/Icon';
 import { PASSWORD_RULES, passwordError } from '../domain/password';
+import { AccountNotConfirmedError } from '../domain/user';
 import { DEMO_ACCOUNTS } from '../infrastructure/localAuthGateway';
 import { useAuth } from '../state/AuthContext';
 
@@ -18,6 +19,7 @@ export interface AuthRedirectState {
 }
 
 const CODE_LENGTH = 6;
+const RESEND_COOLDOWN_SECONDS = 30;
 
 function Field({ label, aside, children }: { label: string; aside?: ReactNode; children: ReactNode }) {
   return (
@@ -79,7 +81,7 @@ function ErrorText({ message }: { message: string | null }) {
 }
 
 export function AuthPage({ initialMode }: { initialMode: 'login' | 'register' }) {
-  const { signIn, signUp, confirmSignUp, requestPasswordReset, confirmPasswordReset, signInWithGoogle } = useAuth();
+  const { signIn, signUp, confirmSignUp, resendSignUpCode, requestPasswordReset, confirmPasswordReset, signInWithGoogle } = useAuth();
   const { dataSource } = useServices();
   const { openChat } = useShopUI();
   const navigate = useNavigate();
@@ -93,6 +95,20 @@ export function AuthPage({ initialMode }: { initialMode: 'login' | 'register' })
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [resendIn, setResendIn] = useState(0);
+
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const timer = setTimeout(() => setResendIn((seconds) => seconds - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendIn]);
+
+  const showCodeStep = () => {
+    setCode('');
+    setNotice(null);
+    setResendIn(RESEND_COOLDOWN_SECONDS);
+    setMode('code');
+  };
 
   const finish = () => {
     navigate(redirect.from ?? '/', { replace: true });
@@ -114,7 +130,14 @@ export function AuthPage({ initialMode }: { initialMode: 'login' | 'register' })
   const login = (event: FormEvent, credentials = { email, password }) => {
     event.preventDefault();
     void run(async () => {
-      await signIn(credentials);
+      try {
+        await signIn(credentials);
+      } catch (cause) {
+        if (!(cause instanceof AccountNotConfirmedError)) throw cause;
+        await resendSignUpCode(credentials.email);
+        showCodeStep();
+        return;
+      }
       finish();
     });
   };
@@ -127,8 +150,7 @@ export function AuthPage({ initialMode }: { initialMode: 'login' | 'register' })
     void run(async () => {
       const { needsConfirmation } = await signUp({ email, password });
       if (needsConfirmation) {
-        setCode('');
-        setMode('code');
+        showCodeStep();
       } else {
         await signIn({ email, password });
         finish();
@@ -143,6 +165,15 @@ export function AuthPage({ initialMode }: { initialMode: 'login' | 'register' })
       await confirmSignUp(email, code);
       await signIn({ email, password });
       finish();
+    });
+  };
+
+  const resendCode = () => {
+    void run(async () => {
+      await resendSignUpCode(email);
+      setCode('');
+      setNotice('Te mandamos un código nuevo.');
+      setResendIn(RESEND_COOLDOWN_SECONDS);
     });
   };
 
@@ -316,7 +347,7 @@ export function AuthPage({ initialMode }: { initialMode: 'login' | 'register' })
           </span>
           <h1 className="display text-[40px] leading-[0.9]">Revisá tu mail</h1>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Te mandamos un código de 6 dígitos a <b className="text-foreground">{email}</b>.
+            Te mandamos un código de 6 dígitos a <b className="text-foreground">{email}</b>. Si no lo ves, revisá en correo no deseado: llega de no-reply@verificationemail.com.
           </p>
           <CodeInput
             value={code}
@@ -326,10 +357,19 @@ export function AuthPage({ initialMode }: { initialMode: 'login' | 'register' })
               setError(null);
             }}
           />
+          {notice && (
+            <span role="status" className="flex items-center gap-1.5 text-[13px] font-medium text-success">
+              <Icon name="check-circle" className="text-base" />
+              {notice}
+            </span>
+          )}
           <ErrorText message={error} />
           <button type="submit" disabled={busy} className="btn-primary">
             {busy && <Icon name="circle-notch" className="animate-spin" />}
             Verificar
+          </button>
+          <button type="button" disabled={busy || resendIn > 0} onClick={resendCode} className="h-10 cursor-pointer text-[13px] font-medium underline underline-offset-2 disabled:cursor-default disabled:text-muted-foreground disabled:no-underline">
+            {resendIn > 0 ? `Reenviar código en ${resendIn} s` : 'Reenviar código'}
           </button>
         </form>
       )}
