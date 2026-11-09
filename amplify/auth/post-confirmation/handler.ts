@@ -7,7 +7,9 @@ const cognito = new CognitoIdentityProviderClient();
 const adminEmails = env.ADMIN_EMAILS.split(',');
 
 export const handler: PostConfirmationTriggerHandler = async (event) => {
-  if (isAdminEmail(event.request.userAttributes.email, adminEmails)) {
+  const { email, email_verified: emailVerified, identities } = event.request.userAttributes;
+  const isNativeVerifiedSignUp = event.triggerSource === 'PostConfirmation_ConfirmSignUp' && emailVerified === 'true' && !identities;
+  if (isNativeVerifiedSignUp && isAdminEmail(email, adminEmails)) {
     await cognito.send(
       new AdminAddUserToGroupCommand({
         GroupName: env.ADMIN_GROUP,
