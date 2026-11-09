@@ -25,11 +25,10 @@ export const CATEGORY_IMAGES: Record<string, string> = {
   Accesorios: photo(14742784),
 };
 
-const HERO_PHOTO = 'https://images.pexels.com/photos/29840338/pexels-photo-29840338.jpeg?auto=compress&cs=tinysrgb';
 const HERO_WIDTHS = [1280, 1920, 2560, 3200];
 
 export const HERO_IMAGE = {
-  src: `${HERO_PHOTO}&w=1920`,
-  srcSet: HERO_WIDTHS.map((width) => `${HERO_PHOTO}&w=${width} ${width}w`).join(', '),
+  src: '/images/hero-1920.jpg',
+  srcSet: HERO_WIDTHS.map((width) => `/images/hero-${width}.jpg ${width}w`).join(', '),
   sizes: '(max-width: 1023px) 250vw, 100vw',
 };
